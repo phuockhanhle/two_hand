@@ -2,6 +2,21 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 
+"""
+class ImageModel
+    base and out  
+class VoiceModel
+    base and out 
+
+class MixMode 
+    init 
+    from pretrained ImageModel, VoiceModel
+    Freeze base of 2 model component
+    train on Mix data, validate on absent data 
+    
+"""
+
+
 class MixedModel(keras.Model):
     def __init__(self, num_classes, input_image_shape, input_voice_shape):
 
@@ -53,7 +68,7 @@ class MixedModel(keras.Model):
         fcn_voice_to_image_out = self.fcn_voice_to_image(base_voice_out)
         fcn_image_out = self.fcn_image(base_image_out + fcn_voice_to_image_out)
 
-        return self.image_out(fcn_voice_out), self.image_out(fcn_image_out)
+        return self.voice_out(fcn_voice_out), self.image_out(fcn_image_out)
 
 
 def create_model_image():
