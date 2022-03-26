@@ -31,11 +31,13 @@ if __name__ == '__main__':
 
     # md.train(model, x_train, y_train, 64, 10)
     # model.fit(x_train_image, y_train_image, batch_size=64, epochs=3)
-    model.fit([x_train_image, x_train_voice], [y_train_voice, y_train_voice], batch_size=64, epochs=15)
+    model.fit([x_train_voice, x_train_image], [y_train_voice, y_train_voice], batch_size=32, epochs=20)
 
-    print("validation")
     # model.evaluate([np.zeros(x_test_image.shape), x_test_voice], [y_test_voice, y_test_voice])
-    model.evaluate([x_test_image, np.zeros(x_test_voice.shape)], [y_test_voice, y_test_voice])
+    print("validation have image to predict voice")
+    model.evaluate([np.zeros(x_test_voice.shape), x_test_image], [y_test_voice, y_test_voice])
+    print("validation have voice to predict image")
+    model.evaluate([x_test_voice, np.zeros(x_test_image.shape)], [y_test_voice, y_test_voice])
 
     # md.evaluate(model, x_test, y_test)
     #

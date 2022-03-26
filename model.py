@@ -41,8 +41,8 @@ class MixedModel(keras.Model):
         self.voice_out = layers.Dense(num_classes, activation="softmax")
 
     def call(self, inputs):
-        image = inputs[0]
-        voice = inputs[1]
+        voice = inputs[0]
+        image = inputs[1]
 
         base_image_out = self.base_image(image)
         base_voice_out = self.base_voice(voice)
@@ -53,8 +53,7 @@ class MixedModel(keras.Model):
         fcn_voice_to_image_out = self.fcn_voice_to_image(base_voice_out)
         fcn_image_out = self.fcn_image(base_image_out + fcn_voice_to_image_out)
 
-        return self.image_out(fcn_image_out), self.image_out(fcn_voice_out)
-
+        return self.image_out(fcn_voice_out), self.image_out(fcn_image_out)
 
 
 def create_model_image():
