@@ -1,0 +1,27 @@
+from tensorflow import keras
+from tensorflow.keras import layers
+
+
+class VoiceModel(keras.Model):
+    def __init__(self, num_classes=10):
+
+        super(VoiceModel, self).__init__()
+
+        self.base = keras.Sequential(
+            [
+                layers.Conv2D(256, kernel_size=(4, 4), activation="relu"),
+                layers.MaxPooling2D(pool_size=(4, 4)),
+                layers.BatchNormalization(),
+                layers.Dropout(0.2),
+                layers.Flatten(),
+                layers.Dense(64, activation="relu"),
+            ]
+        )
+
+        self.fcn = layers.Dense(32, activation="relu")
+        self.out = layers.Dense(num_classes, activation="softmax")
+
+    def call(self, inputs):
+        base_out = self.base(inputs)
+        fcn_out = self.fcn(base_out)
+        return self.out(fcn_out)
