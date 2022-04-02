@@ -12,7 +12,7 @@ if __name__ == '__main__':
     x_train_image, x_test_image, y_train_image, y_test_image = preprocess.build_dataset_image()
     image_model = model_image.ImageModel()
     model_utils.optimize_model(image_model)
-    image_model.fit(x_train_image, y_train_image, batch_size=64, epochs=5)
+    image_model.fit(x_train_image, y_train_image, batch_size=64, epochs=1)
     print("validation of image model only")
     model_utils.evaluate(image_model, x_test_image, y_test_image)
 

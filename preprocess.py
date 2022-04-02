@@ -21,10 +21,10 @@ def build_dataset_image():
     print(x_train.shape[0], "train samples")
     print(x_test.shape[0], "test samples")
 
-    y_train = keras.utils.to_categorical(y_train, 10)
-    y_test = keras.utils.to_categorical(y_test, 10)
+    y_train_cat = keras.utils.to_categorical(y_train, 10)
+    y_test_cat = keras.utils.to_categorical(y_test, 10)
 
-    return x_train, x_test, y_train, y_test
+    return x_train, x_test, y_train_cat, y_test_cat
 
 
 def get_dataset_voice(DATASET_PATH):
@@ -93,19 +93,21 @@ def build_dataset_mixed(num_classes):
                                                                                    digit=None,
                                                                                    path_prepro="./data/prepro_dataset")
 
-    nb_samples_train_per_digit = [np.sum(np.where(y_train_voice == 1)[1] == digit) for digit in range(num_classes)]
-    x_train_image_for_mix = []
-    for digit, nb_samples in enumerate(nb_samples_train_per_digit):
-        x_train_image_for_mix.extend(x_train_by_class[digit][:nb_samples])
-
-    nb_samples_test_per_digit = [np.sum(np.where(y_test_voice == 1)[1] == digit) for digit in range(num_classes)]
-    x_test_image_for_mix = []
-    for digit, nb_samples in enumerate(nb_samples_test_per_digit):
-        x_test_image_for_mix.extend(x_test_by_class[digit][:nb_samples])
-
-    print(len(x_train_image_for_mix))
+    x_train_image_for_mix = get_image_by_labels(x_train_by_class, y_train_voice, num_classes)
+    x_test_image_for_mix = get_image_by_labels(x_test_by_class, y_test_voice, num_classes)
 
     return np.stack(x_train_image_for_mix), np.stack(x_test_image_for_mix), x_train_voice, x_test_voice, y_train_voice, y_test_voice
+
+
+def get_image_by_labels(x_by_class, labels, num_classes):
+    x = []
+    list_index = [0 for _ in range(num_classes)]
+    for y in labels:
+        digit = np.where(y == 1)[0][0]
+        idx = list_index[digit]
+        x.append(x_by_class[digit][idx])
+        list_index[digit] += 1
+    return x
 
 
 def get_image_data_by_class(num_class):
