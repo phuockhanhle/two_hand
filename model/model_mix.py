@@ -12,22 +12,21 @@ class MixedModel(keras.Model):
         self.base_voice = voice_model.base
         self.base_voice.trainable = False
 
-        # self.fcn_image = layers.Dense(32, activation="relu")
-        # self.dropout_image = layers.Dropout(0.5)
-        # self.image_out = layers.Dense(num_classes, activation="softmax")
+        self.fcn_image = layers.Dense(32, activation="relu")
+        self.image_out = layers.Dense(num_classes, activation="softmax")
+
+        self.fcn_voice = layers.Dense(32, activation="relu")
+        self.voice_out = layers.Dense(num_classes, activation="softmax")
+
+        # self.fcn_image = image_model.fcn
+        # self.fcn_image.trainable = True
+        # self.image_out = image_model.out
+        # self.image_out.trainable = True
         #
-        # self.fcn_voice = layers.Dense(32, activation="relu")
-        # self.voice_out = layers.Dense(num_classes, activation="softmax")
-
-        self.fcn_image = image_model.fcn
-        self.fcn_image.trainable = False
-        self.image_out = image_model.out
-        self.image_out.trainable = False
-
-        self.fcn_voice = voice_model.fcn
-        self.fcn_voice.trainable = False
-        self.voice_out = voice_model.out
-        self.voice_out.trainable = False
+        # self.fcn_voice = voice_model.fcn
+        # self.fcn_voice.trainable = True
+        # self.voice_out = voice_model.out
+        # self.voice_out.trainable = True
 
         self.fcn_voice_to_image = layers.Dense(64, activation="relu")
         self.fcn_image_to_voice = layers.Dense(64, activation="relu")

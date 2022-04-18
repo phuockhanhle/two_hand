@@ -12,7 +12,7 @@ if __name__ == '__main__':
     x_train_image, x_test_image, y_train_image, y_test_image = preprocess.build_dataset_image()
     image_model = model_image.ImageModel()
     model_utils.optimize_model(image_model)
-    image_model.fit(x_train_image, y_train_image, batch_size=64, epochs=1)
+    image_model.fit(x_train_image, y_train_image, batch_size=64, epochs=5)
     print("validation of image model only")
     model_utils.evaluate(image_model, x_test_image, y_test_image)
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
                                                                                               path_prepro="./data/prepro_dataset")
     voice_model = model_voice.VoiceModel()
     model_utils.optimize_model(voice_model)
-    voice_model.fit(x_voice_train, y_voice_train, batch_size=64, epochs=5)
+    voice_model.fit(x_voice_train, y_voice_train, batch_size=64, epochs=10)
     print("validation of voice model only")
     model_utils.evaluate(voice_model, x_voice_test, y_voice_test)
 
@@ -32,13 +32,13 @@ if __name__ == '__main__':
 
     mix_model = model_mix.MixedModel(image_model, voice_model)
     model_utils.optimize_model(mix_model)
-    mix_model.fit([x_train_voice, x_train_image], [y_train_voice, y_train_voice], batch_size=64, epochs=10)
+    mix_model.fit([x_train_voice, x_train_image], [y_train_voice, y_train_voice], batch_size=64, epochs=20)
 
     print("validation have image to predict voice")
     mix_model.evaluate([np.zeros(x_test_voice.shape), x_test_image], [y_test_voice, y_test_voice])
     print("validation have voice to predict image")
     mix_model.evaluate([x_test_voice, np.zeros(x_test_image.shape)], [y_test_voice, y_test_voice])
-
+    print(f"output 1 acc : voice acc ||| output 2 acc : image acc")
     # md.evaluate(model, x_test, y_test)
     #
     # md.debug()
