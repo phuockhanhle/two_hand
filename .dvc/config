@@ -1,6 +1,4 @@
 [core]
-    remote = myremote
-['remote "myremote"']
-    url = \
-['remote "data"']
+    remote = prepro_dataset
+['remote "prepro_dataset"']
     url = gdrive://114CqlrCNvC6zWrAiD_Txa9dNcpSWacxF

@@ -1,0 +1,5 @@
+outs:
+- md5: 25ffdfad7ee85d405003b316a5eec430.dir
+  size: 47640512
+  nfiles: 4
+  path: prepro_dataset

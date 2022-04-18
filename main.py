@@ -39,6 +39,11 @@ if __name__ == '__main__':
     print("validation have voice to predict image")
     mix_model.evaluate([x_test_voice, np.zeros(x_test_image.shape)], [y_test_voice, y_test_voice])
     print(f"output 1 acc : voice acc ||| output 2 acc : image acc")
+
+    print("save model")
+    image_model.save("./data/pretrain_model/image_model")
+    voice_model.save("./data/pretrain_model/voice_model")
+    mix_model.save("./data/pretrain_model/mix_model")
     # md.evaluate(model, x_test, y_test)
     #
     # md.debug()

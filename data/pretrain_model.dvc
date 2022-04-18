@@ -1,0 +1,5 @@
+outs:
+- md5: 70fbfcd511554106fb745637e3722538.dir
+  size: 28336004
+  nfiles: 12
+  path: pretrain_model
