@@ -1,9 +1,16 @@
 import os
+import wave
+
+from scipy.io import wavfile
 from tensorflow import keras
 import numpy as np
-import librosa
+from pathlib import Path
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+import cv2
 
 
 def build_dataset_image():
@@ -14,7 +21,6 @@ def build_dataset_image():
     # x_train = x_train.astype("float32")
     x_test = x_test.astype("float32") / 255
     # x_test = x_test.astype("float32")
-    # Make sure images have shape (28, 28, 1)
     x_train = np.expand_dims(x_train, -1)
     x_test = np.expand_dims(x_test, -1)
     print("x_train shape:", x_train.shape)
@@ -27,71 +33,52 @@ def build_dataset_image():
     return x_train, x_test, y_train_cat, y_test_cat
 
 
-def get_dataset_voice(DATASET_PATH):
-    mfcc_list, digit = [], []
-    for idx, file_name in enumerate(tqdm(os.listdir(DATASET_PATH))):
-        name = file_name.split('_')
-        digit.append(name[0])
-        wav, sr = librosa.load(os.path.join(DATASET_PATH, file_name))
-        mfcc = librosa.feature.mfcc(y=wav)
-        mfcc_list.append(mfcc)
-
-    return mfcc_list, digit
+def get_wav_info(wav_file):
+    wav = wave.open(wav_file, 'r')
+    frames = wav.readframes(-1)
+    sound_info = np.frombuffer(frames, np.int16)
+    frame_rate = wav.getframerate()
+    wav.close()
+    return sound_info, frame_rate
 
 
-def get_max_shape(mfcc_list):
-    shape_col = np.max([mfcc.shape[1] for mfcc in mfcc_list])
-    shape_row = np.max([mfcc.shape[0] for mfcc in mfcc_list])
+def convert_wax_to_image(INPUT_DIR, OUTPUT_DIR):
+    for idx, filename in tqdm(enumerate(os.listdir(INPUT_DIR))):
+        # if idx == 10:
+        #     return
+        if "wav" in filename:
+            file_path = os.path.join(INPUT_DIR, filename)
+            file_stem = Path(file_path).stem
+            file_dist_path = os.path.join(OUTPUT_DIR, file_stem) + '.png'
+            frame_rate, data = wavfile.read(file_path)
+            plt.ioff()
+            plt.axis('off')
+            plt.specgram(data, Fs=frame_rate)
+            plt.savefig(file_dist_path)
+            plt.clf()
 
-    return shape_row, shape_col
 
-
-def padding(mfcc, max_shape_col, max_shape_roz=0):
-    mfcc = np.hstack((mfcc, np.zeros((mfcc.shape[0], max_shape_col - mfcc.shape[1]))))
-    # np.hstack((mfcc, np.zeros((mfcc.shape[1], max_shape_roz - mfcc.shape[0]))))
-    return mfcc
-
-
-def build_dataset_voice(mfcc_list, digit, path_prepro):
-    data_dict = {
-        'x_train': None,
-        'x_test': None,
-        'y_train': None,
-        'y_test': None,
-    }
-
-    if not os.path.exists(os.path.join(path_prepro, 'x_train.npy')):
-        shape_row, shape_col = get_max_shape(mfcc_list)
-
-        x, y = [], []
-
-        for idx, mfcc in enumerate(tqdm(mfcc_list)):
-            mfcc = padding(mfcc, shape_col)
-            x.append(mfcc)
-            y.append(digit[idx])
-
-        x = np.array(x)
-        x = np.expand_dims(x, -1)
-        y = keras.utils.to_categorical(np.array(y), 10)
-
-        data_dict['x_train'], data_dict["x_test"], data_dict['y_train'], data_dict["y_test"] = train_test_split(
-            x, y, test_size=0.33, random_state=42)
-
-        for name, value in data_dict.items():
-            np.save(os.path.join(path_prepro, name), value)
-    else:
-
-        for name in data_dict.keys():
-            data_dict[name] = np.load(os.path.join(path_prepro, f"{name}.npy"))
-
-    return data_dict['x_train'], data_dict["x_test"], data_dict['y_train'], data_dict["y_test"]
+def build_dataset_voice(source_dir):
+    X = []
+    y = []
+    for idx, file_name in tqdm(enumerate(os.listdir(source_dir))):
+        file_path = os.path.join(source_dir, file_name)
+        label = int(file_name.split('_')[0])
+        data = cv2.imread(file_path)
+        data = cv2.resize(data, (256, 256))
+        X.append(data)
+        y.append(label)
+    X = np.array(X)
+    y = np.array(y)
+    X = X.astype("float32") / 255
+    y = keras.utils.to_categorical(y, 10)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    return X_train, X_test, y_train, y_test
 
 
 def build_dataset_mixed(num_classes):
     x_train_by_class, x_test_by_class = get_image_data_by_class(num_classes)
-    x_train_voice, x_test_voice, y_train_voice, y_test_voice = build_dataset_voice(mfcc_list=None,
-                                                                                   digit=None,
-                                                                                   path_prepro="./data/prepro_dataset")
+    x_train_voice, x_test_voice, y_train_voice, y_test_voice = build_dataset_voice(source_dir='./data/prepro_dataset')
 
     x_train_image_for_mix = get_image_by_labels(x_train_by_class, y_train_voice, num_classes)
     x_test_image_for_mix = get_image_by_labels(x_test_by_class, y_test_voice, num_classes)
