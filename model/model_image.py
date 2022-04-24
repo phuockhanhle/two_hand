@@ -15,13 +15,12 @@ class ImageModel(keras.Model):
                 layers.MaxPooling2D(pool_size=(2, 2)),
                 layers.Flatten(),
                 layers.Dense(64, activation="relu"),
+                layers.Dense(32, activation="relu"),
             ]
         )
 
-        self.fcn = layers.Dense(32, activation="relu")
         self.out = layers.Dense(num_classes, activation="softmax")
 
     def call(self, inputs):
         base_out = self.base(inputs)
-        fcn_out = self.fcn(base_out)
-        return self.out(fcn_out)
+        return self.out(base_out)

@@ -1,16 +1,16 @@
 import os
 import wave
-
 from scipy.io import wavfile
 from tensorflow import keras
 import numpy as np
 from pathlib import Path
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 import cv2
+import matplotlib
+matplotlib.use('Agg')
+
 
 
 def build_dataset_image():
@@ -44,8 +44,6 @@ def get_wav_info(wav_file):
 
 def convert_wax_to_image(INPUT_DIR, OUTPUT_DIR):
     for idx, filename in tqdm(enumerate(os.listdir(INPUT_DIR))):
-        # if idx == 10:
-        #     return
         if "wav" in filename:
             file_path = os.path.join(INPUT_DIR, filename)
             file_stem = Path(file_path).stem
@@ -76,14 +74,15 @@ def build_dataset_voice(source_dir):
     return X_train, X_test, y_train, y_test
 
 
-def build_dataset_mixed(num_classes):
-    x_train_by_class, x_test_by_class = get_image_data_by_class(num_classes)
-    x_train_voice, x_test_voice, y_train_voice, y_test_voice = build_dataset_voice(source_dir='./data/prepro_dataset')
+def build_dataset_mixed(num_classes, *, y_train_voice, y_test_voice,
+                        x_train_image, x_test_image, y_train_image, y_test_image):
+    x_train_by_class, x_test_by_class = get_image_data_by_class(num_classes, x_train_image, x_test_image,
+                                                                y_train_image, y_test_image)
 
     x_train_image_for_mix = get_image_by_labels(x_train_by_class, y_train_voice, num_classes)
     x_test_image_for_mix = get_image_by_labels(x_test_by_class, y_test_voice, num_classes)
 
-    return np.stack(x_train_image_for_mix), np.stack(x_test_image_for_mix), x_train_voice, x_test_voice, y_train_voice, y_test_voice
+    return np.stack(x_train_image_for_mix), np.stack(x_test_image_for_mix)
 
 
 def get_image_by_labels(x_by_class, labels, num_classes):
@@ -97,11 +96,9 @@ def get_image_by_labels(x_by_class, labels, num_classes):
     return x
 
 
-def get_image_data_by_class(num_class):
+def get_image_data_by_class(num_class, x_train_image, x_test_image, y_train_image, y_test_image):
     x_train_by_class = [[] for _ in range(num_class)]
     x_test_by_class = [[] for _ in range(num_class)]
-
-    x_train_image, x_test_image, y_train_image, y_test_image = build_dataset_image()
 
     for idx, y in enumerate(y_train_image[:]):
         digit = np.where(y == 1)[0][0]
