@@ -15,4 +15,3 @@ def train(*, model, x_train, y_train,
 
 def evaluate(model, x_test, y_test):
     model.evaluate(x_test, y_test, verbose=0)
-
