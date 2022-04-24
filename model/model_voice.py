@@ -9,19 +9,27 @@ class VoiceModel(keras.Model):
 
         self.base = keras.Sequential(
             [
-                layers.Conv2D(256, kernel_size=(4, 4), activation="relu"),
-                layers.MaxPooling2D(pool_size=(4, 4)),
-                layers.BatchNormalization(),
-                layers.Dropout(0.2),
+                layers.Conv2D(32, kernel_size=(3, 3), strides=2, padding='same', activation='relu'),
+                # layers.BatchNormalization(),
+                layers.MaxPooling2D(pool_size=(2, 2)),
+                # layers.BatchNormalization(),
+                layers.Conv2D(64, kernel_size=(3, 3), padding='same', activation='relu'),
+                # layers.BatchNormalization(),
+                layers.MaxPooling2D(pool_size=(2, 2)),
+                # layers.BatchNormalization(),
+                layers.Conv2D(128, kernel_size=(3, 3), padding='same', activation='relu'),
+                # layers.BatchNormalization(),
+                layers.MaxPooling2D(pool_size=(2, 2)),
+                # layers.BatchNormalization(),
                 layers.Flatten(),
-                layers.Dense(64, activation="relu"),
+                layers.Dense(128, activation="relu"),
+                # layers.BatchNormalization(),
+                layers.Dropout(0.5),
             ]
         )
 
-        self.fcn = layers.Dense(32, activation="relu")
         self.out = layers.Dense(num_classes, activation="softmax")
 
     def call(self, inputs):
         base_out = self.base(inputs)
-        fcn_out = self.fcn(base_out)
-        return self.out(fcn_out)
+        return self.out(base_out)
