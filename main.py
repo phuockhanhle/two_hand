@@ -1,5 +1,4 @@
 import numpy as np
-
 import model.model_voice as model_voice
 import model.model_image as model_image
 import model.model_mix as model_mix
@@ -8,19 +7,20 @@ import preprocess
 
 if __name__ == '__main__':
     # Train image model
-    # x_train_image, x_test_image, y_train_image, y_test_image = preprocess.build_dataset_image()
-    # image_model = model_image.ImageModel()
-    # model_utils.optimize_model(image_model)
-    # image_model.fit(x_train_image, y_train_image, batch_size=64, epochs=5)
-    # print("validation of image model only")
-    # model_utils.evaluate(image_model, x_test_image, y_test_image)
+    x_train_image, x_test_image, y_train_image, y_test_image = preprocess.build_dataset_image()
+    image_model = model_image.ImageModel()
+    model_utils.optimize_model(image_model)
+    model_utils.train(model=model_voice, x_train=x_train_image, y_train=y_train_image,
+                      batch_size=64, epochs=5)
+    print("validation of image model only")
+    model_utils.evaluate(image_model, x_test_image, y_test_image)
 
     # Train voice model
     x_voice_train, x_voice_test, y_voice_train, y_voice_test = preprocess.build_dataset_voice("./data/prepro_dataset")
     voice_model = model_voice.VoiceModel()
     model_utils.optimize_model(voice_model)
     model_utils.train(model=model_voice, x_train=x_voice_train, y_train=y_voice_train,
-                      x_val=x_voice_test, y_val=y_voice_test)
+                      batch_size=32, epochs=10)
     print("validation of voice model only")
     model_utils.evaluate(voice_model, x_voice_test, y_voice_test)
 
