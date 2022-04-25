@@ -2,3 +2,4 @@ data/prepro_dataset
 data/free-spoken-digit-dataset-master
 .idea/
 __pycache__/
+mlruns/
