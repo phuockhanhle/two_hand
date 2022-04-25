@@ -9,7 +9,7 @@ import mlflow
 if __name__ == '__main__':
     # Hyper parameters TODO: fix with argparse
     params = {"model_image_batch_size": 64, "model_image_epoch": 5,
-              "model_voice_batch_size": 32, "model_voice_epoch": 20,
+              "model_voice_batch_size": 32, "model_voice_epoch": 10,
               "model_mix_batch_size": 32, "model_mix_epoch": 10,
               }
 
@@ -57,9 +57,9 @@ if __name__ == '__main__':
                                                                       [x_test_voice, np.zeros(x_test_image.shape)],
                                                                       [y_test_voice, y_test_voice])
 
-    # print("save model")
-    # image_model.save("./data/pretrain_model/image_model")
-    # voice_model.save("./data/pretrain_model/voice_model")
+    print("save model")
+    image_model.save("./data/pretrain_model/image_model")
+    voice_model.save("./data/pretrain_model/voice_model")
     # mix_model.save("./data/pretrain_model/mix_model")
 
     with mlflow.start_run() as run:
